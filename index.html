@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Chess - Thomas Fisher (100198032)</title>
+	<title>Chess - editing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body onload="setup();">
 
-<h1>Thomas Fisher's and Max Shvartsman's Chess Project</h1>
+<h1></h1>
 <p id="turnInfo">Player's turn: <b>White</b></p>
 <section id="board">
     <div class="overlay" id="promotionMessage">
@@ -37,6 +38,27 @@
 		</div>
 	</div>
 </section>
+<script src="http://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+
+<script>
+  const socket = io();
+
+  let myColor;
+  socket.on('playerColor', color => {
+    console.log("connected to socket")
+    myColor = color;
+    alert("You are: " + color);
+  });
+
+  socket.on('move', data => {
+    // Update board state with opponent's move
+    applyMove(data);
+  });
+
+  function emitMove(move) {
+    socket.emit('move', move);
+  }
+</script>
 
 <script type="text/javascript" src="js/scripts.js"></script>
 

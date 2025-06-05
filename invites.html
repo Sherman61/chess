@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Active Invites</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .invite-list { margin: 20px 0; }
+    button { margin-left: 10px; }
+  </style>
+</head>
+<body>
+    <a href="logout.php">Logout</a>
+
+    <span id="statusText">Connecting...</span>
+    <div id="inviteSection">
+        <input type="text" id="inviteUsername" placeholder="Invite player by username">
+        <button onclick="sendInvite()">Send Invite</button>
+        
+      </div>
+<h2>Active Invites</h2>
+<p id="status">Connecting...</p>
+
+<h3>Outgoing Challenges</h3>
+<ul id="outgoingList" class="invite-list"></ul>
+
+<h3>Incoming Challenges</h3>
+<ul id="incomingList" class="invite-list"></ul>
+
+<script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+<script>
+let socket;
+let currentUser;
+let room;
+
+fetch('check_session.php')
+  .then(res => res.json())
+  .then(data => {
+    if (!data.username) {
+      alert("Not logged in");
+      window.location.href = "login.html";
+      return;
+    }
+
+    currentUser = data.username;
+    document.getElementById('status').innerText = "Logged in as " + currentUser;
+
+    socket = io("https://shiyaswebsite.com:3001", {
+      auth: { username: currentUser }
+    });
+
+    socket.on("connect", () => {
+  console.log("[Socket.IO] Connected, requesting active invites...");
+  socket.emit("getActiveInvites");
+});
+
+
+socket.on("activeInvites", data => {
+  console.log("[Invites] Received:", data); // ← debug this
+
+  const outgoingList = document.getElementById('outgoingList');
+  const incomingList = document.getElementById('incomingList');
+  outgoingList.innerHTML = "";
+  incomingList.innerHTML = "";
+
+  data.outgoing.forEach(target => {
+    const li = document.createElement("li");
+    li.textContent = target;
+    outgoingList.appendChild(li);
+  });
+
+  data.incoming.forEach(from => {
+    const li = document.createElement("li");
+    li.textContent = from;
+    const btn = document.createElement("button");
+    btn.textContent = "Accept";
+    btn.onclick = () => {
+      socket.emit("acceptInvite", from);
+    };
+    li.appendChild(btn);
+    incomingList.appendChild(li);
+  });
+});
+
+socket.on("inviteAccepted", data => {
+        const roomName = typeof data === "string" ? data : data.room;
+        if (!room) {
+          room = roomName;
+          window.history.replaceState({}, '', `?room=${encodeURIComponent(roomName)}`);
+        }
+      
+        const [player1, player2] = roomName.split("-");
+        const isWhite = currentUser === player1;
+        myPlayerColor = isWhite ? "white" : "black";
+        
+        connectedOpponent = data.opponentDisplayName || data.opponentUsername || (isWhite ? player2 : player1);
+      
+        document.getElementById("status").innerText = `Connected to: ${connectedOpponent}`;
+        document.getElementById("statusText").innerText = `Connected to: ${connectedOpponent}`;
+        document.getElementById("inviteSection").style.display = "none";
+      
+        startGame(myPlayerColor);
+      });
+  });
+</script>
+
+</body>
+</html>

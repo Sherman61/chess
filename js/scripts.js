@@ -1,5 +1,6 @@
-// jshint esversion: 6
-// jshint browser: true
+
+let myPlayerColor = null; // set by startGame()
+let multiplayerMode = false; // only true when game is online
 
 let pieces = [];
 
@@ -599,6 +600,11 @@ let squareClicked = function(e){
 
 let move = function(start, end){
 	let piece = start.piece;
+    const fromX = start.x;
+const fromY = start.y;
+const toX = end.x;
+const toY = end.y;
+
     currentPlayer.moved = start.piece;
 	let moveResult = piece.isValidMove(end);
     console.log("wut");
@@ -644,6 +650,8 @@ let move = function(start, end){
         start.unsetPiece();
         start.deselect();
         selectedSquare = null;
+
+       
         if(moveResult.promote==true){
             currentPlayer.promote=end.piece;
             showPromotion(currentPlayer);
@@ -655,6 +663,9 @@ let move = function(start, end){
             end.setPiece(newPiece);
             showError("promoted!");*/
         }
+
+      
+          
         if(currentPlayer==white)
         {
             if(end.piece.isValidMove(getSquare(black.king.x, black.king.y),2).valid){
@@ -1094,3 +1105,23 @@ let nextTurn = function(){
         document.getElementById("turnInfo").innerHTML = "Player's turn: <b>White</b>";
 	}
 }
+
+
+//scripts.js
+function handleMultiplayerMove(data) {
+    console.log("[Multiplayer] Handling move:", data);
+    multiplayerMode = false;
+  
+    const fromSquare = getSquare(data.from[0], data.from[1]);
+    const toSquare = getSquare(data.to[0], data.to[1]);
+  
+    selectedSquare = fromSquare;
+  
+    // Set currentPlayer to the opponent
+    currentPlayer = myPlayerColor === "white" ? black : white;
+  
+    move(fromSquare, toSquare);
+  
+    multiplayerMode = true;
+  }
+  

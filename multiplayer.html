@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer Chess</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="text/javascript" src="js/scripts.js"></script>
+</head>
+<body onload="setup();">
+
+<h2 id="status">Connecting...</h2>
+<div id="connectionStatus">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span id="statusText">Connecting...</span>
+  </div>
+  
+<div id="inviteSection">
+  <input type="text" id="inviteUsername" placeholder="Invite player by username">
+  <button onclick="sendInvite()">Send Invite</button>
+  
+</div>
+
+<p id="turnInfo">Player's turn: <b>White</b></p>
+
+<section id="board">
+  <div class="overlay" id="promotionMessage">
+    <div class="overlay-inner">
+      <span class="overlay-title">Promotion!</span>
+      <p class="overlay-text" id="alertText"></p>
+      <ul id="promotionList" class="white">
+        <li><a href="#" class="promotion-button queen" onclick="promote('queen');"></a></li>
+        <li><a href="#" class="promotion-button castle" onclick="promote('castle');"></a></li>
+        <li><a href="#" class="promotion-button bishop" onclick="promote('bishop');"></a></li>
+        <li><a href="#" class="promotion-button knight" onclick="promote('knight');"></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="overlay" id="errorMessage">
+    <div class="overlay-inner">
+      <span class="overlay-title">Error!</span>
+      <p class="overlay-text" id="errorText"></p>
+      <a href="#" class="overlay-button" onclick="closeError();">Close</a>
+    </div>
+  </div>
+
+  <div class="overlay" id="endMessage">
+    <div class="overlay-inner">
+      <span class="overlay-title">Game Over!</span>
+      <p class="overlay-text" id="endText"></p>
+      <a href="#" class="overlay-button" onclick="newGame();">New Game</a>
+    </div>
+  </div>
+</section>
+
+<!-- Socket.IO Client -->
+<script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+
+<!-- Multiplayer logic -->
+
+
+<!-- Chess logic -->
+
+<script src="js/game.js"></script>
+
+<script>
+    console.log("fdf");
+    console.log("fdf");
+</script>
+
+
+</body>
+</html>

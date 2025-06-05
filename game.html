@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chess Game</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    #status {
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    #inviteSection {
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="status">Connecting...</div>
+
+<div id="inviteSection">
+  <input type="text" id="inviteUsername" placeholder="Invite player by username">
+  <button onclick="sendInvite()">Send Invite</button>
+</div>
+
+<div id="gameBoard">
+  <!-- Your chess board will be rendered here by your existing JS -->
+</div>
+
+<script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+
+
+</script>
+ 
+<script type="text/javascript" src="js/scripts.js"></script> <!-- Your game logic -->
+<script src="js/game.js"></script>
+</body>
+</html>
