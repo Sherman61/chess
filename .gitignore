@@ -3,3 +3,6 @@ css/.access^
 img/.access^
 js/.access^
 config.php
+backend/config.php
+backend/config.js
+backend/db.js
