@@ -4,105 +4,166 @@
   <meta charset="UTF-8">
   <title>Active Invites</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .invite-list { margin: 20px 0; }
-    button { margin-left: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+
+    a {
+      float: right;
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: #0077cc;
+    }
+
+    h2, h3 {
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    #statusText {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    #inviteSection {
+      margin: 15px 0;
+    }
+
+    input[type="text"] {
+      padding: 6px;
+      font-size: 14px;
+      width: 250px;
+    }
+
+    button {
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    ul.invite-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul.invite-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-    <a href="logout.php">Logout</a>
 
-    <span id="statusText">Connecting...</span>
-    <div id="inviteSection">
-        <input type="text" id="inviteUsername" placeholder="Invite player by username">
-        <button onclick="sendInvite()">Send Invite</button>
-        
-      </div>
-<h2>Active Invites</h2>
-<p id="status">Connecting...</p>
+  <a href="logout.php">Logout</a>
+  <span id="statusText">Connecting...</span>
 
-<h3>Outgoing Challenges</h3>
-<ul id="outgoingList" class="invite-list"></ul>
+  <div id="inviteSection">
+    <input type="text" id="inviteUsername" placeholder="Invite player by username">
+    <button onclick="sendInvite()">Send Invite</button>
+  </div>
 
-<h3>Incoming Challenges</h3>
-<ul id="incomingList" class="invite-list"></ul>
+  <h2>Active Invites</h2>
+  <p id="status">Connecting...</p>
 
-<script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
-<script>
-let socket;
-let currentUser;
-let room;
+  <h3>Outgoing Challenges</h3>
+  <ul id="outgoingList" class="invite-list"></ul>
 
-fetch('check_session.php')
-  .then(res => res.json())
-  .then(data => {
-    if (!data.username) {
-      alert("Not logged in");
-      window.location.href = "login.html";
-      return;
-    }
+  <h3>Incoming Challenges</h3>
+  <ul id="incomingList" class="invite-list"></ul>
 
-    currentUser = data.username;
-    document.getElementById('status').innerText = "Logged in as " + currentUser;
+  <script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+  <script>
+    let socket;
+    let currentUser;
+    let room;
 
-    socket = io("https://shiyaswebsite.com:3001", {
-      auth: { username: currentUser }
-    });
-
-    socket.on("connect", () => {
-  console.log("[Socket.IO] Connected, requesting active invites...");
-  socket.emit("getActiveInvites");
-});
-
-
-socket.on("activeInvites", data => {
-  console.log("[Invites] Received:", data); // ← debug this
-
-  const outgoingList = document.getElementById('outgoingList');
-  const incomingList = document.getElementById('incomingList');
-  outgoingList.innerHTML = "";
-  incomingList.innerHTML = "";
-
-  data.outgoing.forEach(target => {
-    const li = document.createElement("li");
-    li.textContent = target;
-    outgoingList.appendChild(li);
-  });
-
-  data.incoming.forEach(from => {
-    const li = document.createElement("li");
-    li.textContent = from;
-    const btn = document.createElement("button");
-    btn.textContent = "Accept";
-    btn.onclick = () => {
-      socket.emit("acceptInvite", from);
-    };
-    li.appendChild(btn);
-    incomingList.appendChild(li);
-  });
-});
-
-socket.on("inviteAccepted", data => {
-        const roomName = typeof data === "string" ? data : data.room;
-        if (!room) {
-          room = roomName;
-          window.history.replaceState({}, '', `?room=${encodeURIComponent(roomName)}`);
+    fetch('check_session.php')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username) {
+          alert("Not logged in");
+          window.location.href = "login.html";
+          return;
         }
-      
-        const [player1, player2] = roomName.split("-");
-        const isWhite = currentUser === player1;
-        myPlayerColor = isWhite ? "white" : "black";
-        
-        connectedOpponent = data.opponentDisplayName || data.opponentUsername || (isWhite ? player2 : player1);
-      
-        document.getElementById("status").innerText = `Connected to: ${connectedOpponent}`;
-        document.getElementById("statusText").innerText = `Connected to: ${connectedOpponent}`;
-        document.getElementById("inviteSection").style.display = "none";
-      
-        startGame(myPlayerColor);
+
+        currentUser = data.username;
+        document.getElementById('status').innerText = "Logged in as " + currentUser;
+
+        socket = io("https://shiyaswebsite.com:3001", {
+          auth: { username: currentUser }
+        });
+
+        socket.on("connect", () => {
+          console.log("[Socket.IO] Connected, requesting active invites...");
+          socket.emit("getActiveInvites");
+        });
+
+        socket.on("activeInvites", data => {
+          console.log("[Invites] Received:", data);
+
+          const outgoingList = document.getElementById('outgoingList');
+          const incomingList = document.getElementById('incomingList');
+          outgoingList.innerHTML = "";
+          incomingList.innerHTML = "";
+
+          data.outgoing.forEach(target => {
+            const li = document.createElement("li");
+            li.textContent = target;
+            outgoingList.appendChild(li);
+          });
+
+          data.incoming.forEach(from => {
+            const li = document.createElement("li");
+            li.textContent = from;
+            const btn = document.createElement("button");
+            btn.textContent = "Accept";
+            btn.onclick = () => {
+              socket.emit("acceptInvite", from);
+            };
+            li.appendChild(btn);
+            incomingList.appendChild(li);
+          });
+        });
+
+        socket.on("inviteAccepted", data => {
+          const roomName = typeof data === "string" ? data : data.room;
+          if (!room) {
+            room = roomName;
+            window.history.replaceState({}, '', `?room=${encodeURIComponent(roomName)}`);
+          }
+
+          const [player1, player2] = roomName.split("-");
+          const isWhite = currentUser === player1;
+          myPlayerColor = isWhite ? "white" : "black";
+          connectedOpponent = data.opponentDisplayName || data.opponentUsername || (isWhite ? player2 : player1);
+
+          // Redirect to multiplayer game page
+          window.location.href = `multiplayer.html?room=${encodeURIComponent(roomName)}`;
+        });
       });
-  });
-</script>
+
+    window.sendInvite = function () {
+      const target = document.getElementById('inviteUsername').value.trim();
+      if (target && socket) {
+        console.log(`[Invite] Sending invite to ${target}`);
+        socket.emit("invitePlayer", target);
+        alert(`Invite sent to ${target}`);
+      } else {
+        console.warn("[Invite] Failed: target or socket missing");
+      }
+    };
+  </script>
 
 </body>
 </html>

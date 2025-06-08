@@ -3,6 +3,8 @@ let myPlayerColor = null; // set by startGame()
 let multiplayerMode = false; // only true when game is online
 
 let pieces = [];
+let moveLog = [];
+let moveCount = 1;
 
 let boardSquares = [];
 
@@ -985,8 +987,13 @@ let isCheckmate = function(king){
     }
     console.log("fine3");
     console.log("---------");
+    const algebraic = `${String.fromCharCode(96 + start.x)}${start.y}→${String.fromCharCode(96 + end.x)}${end.y}`;
+logMove(algebraic); // this was added
     return true;
+    
+
 };
+
 
 
 let showPromotion = function(player){
@@ -1125,3 +1132,20 @@ function handleMultiplayerMove(data) {
     multiplayerMode = true;
   }
   
+
+  function logMove(moveText) {
+    const logContainer = document.getElementById("moveLog");
+    moveLog.push(moveText);
+    logContainer.innerHTML = formatMoveLog();
+}
+
+function formatMoveLog() {
+    let output = "";
+    for (let i = 0; i < moveLog.length; i += 2) {
+        const whiteMove = moveLog[i] || "";
+        const blackMove = moveLog[i + 1] || "";
+        const turn = Math.floor(i / 2) + 1;
+        output += `${turn}. ${whiteMove} ${blackMove}<br>`;
+    }
+    return output;
+}

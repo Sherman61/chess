@@ -5,10 +5,12 @@
   <title>Multiplayer Chess</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
+
   <script type="text/javascript" src="js/scripts.js"></script>
 </head>
 <body onload="setup();">
-
+<a href="invites.html">invites</a>
 <h2 id="status">Connecting...</h2>
 <div id="connectionStatus">
     <span class="bar"></span>
@@ -18,7 +20,10 @@
     <span class="bar"></span>
     <span id="statusText">Connecting...</span>
   </div>
+  <h3>Move Log</h3>
+  <div id="moveLog" style="font-family: monospace; white-space: pre-line; padding: 8px; background: #f4f4f4; border: 1px solid #ccc;"></div>
   
+
 <div id="inviteSection">
   <input type="text" id="inviteUsername" placeholder="Invite player by username">
   <button onclick="sendInvite()">Send Invite</button>

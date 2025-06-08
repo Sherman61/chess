@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ongoing Games</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 10px; }
+    a { text-decoration: none; color: blue; }
+  </style>
+</head>
+<body>
+  <h2>Active Chess Games</h2>
+  <ul id="gameList"></ul>
+
+  <script>
+    fetch('backend/ongoing_games.php')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('gameList');
+        data.forEach(game => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="multiplayer.html?room=${game.room_name}">
+            ${game.white_player} vs ${game.black_player} (${game.status})
+          </a>`;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
