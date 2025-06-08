@@ -104,18 +104,94 @@ module.exports = function (io, log) {
       });
     });
 
-    // Handle move made by player
-    socket.on("move", (moveData, room) => {
-      log(`[MOVE] ${username} sent move in ${room}: ${JSON.stringify(moveData)}`);
+// Ask for info about the current game room
+socket.on("getRoomInfo", (roomName, callback) => {
+  const game = ongoingGames[roomName];
 
-      // Save move in memory
+  if (!game || !game.players.includes(socket.username)) {
+    return callback({ error: "Room not found or you're not in this game." });
+  }
+
+  const opponent = game.players.find(p => p !== socket.username);
+  const displayName = userDisplayNames[opponent] || opponent;
+
+  callback({
+    opponentUsername: opponent,
+    opponentDisplayName: displayName
+  });
+});socket.on("rejoinRoom", async (roomName) => {
+  const user = socket.username;
+
+  if (!roomName) return;
+
+  // Try to fetch the game from memory
+  let game = ongoingGames[roomName];
+
+  if (!game) {
+    // Try to rebuild from database
+    try {
+      const [rows] = await db.query("SELECT * FROM ongoing_games WHERE room_name = ?", [roomName]);
+      if (rows.length === 0) {
+        socket.emit("roomRejoinError", "Room not found");
+        return;
+      }
+
+      const row = rows[0];
+      game = {
+        players: [row.white_player, row.black_player],
+        moves: typeof row.move_history === 'string' && row.move_history.trim() ? JSON.parse(row.move_history) : [],
+
+
+        turn: "white"
+      }; 
+
+      ongoingGames[roomName] = game;
+    } catch (err) {
+      console.error("[DB ERROR] rejoinRoom", err);
+      socket.emit("roomRejoinError", "Database error");
+      return;
+    }
+  }
+
+  // Check if user is one of the players
+  if (!game.players.includes(user)) {
+    socket.emit("roomRejoinError", "You're not in this game.");
+    return;
+  }
+
+  socket.join(roomName);
+  const opponent = game.players.find(p => p !== user);
+
+  socket.emit("roomInfo", {
+    room: roomName,
+    opponentUsername: opponent,
+    opponentDisplayName: userDisplayNames[opponent] || opponent
+  });
+
+  console.log(`[REJOIN] ${user} rejoined room ${roomName}`);
+});
+
+
+    // Handle move made by player
+    socket.on("move", async (moveData, room) => {
+      log(`[MOVE] ${username} sent move in ${room}: ${JSON.stringify(moveData)}`);
+    
       if (ongoingGames[room]) {
         ongoingGames[room].moves.push(moveData);
         ongoingGames[room].lastUpdated = new Date();
+    
+        try {
+          await db.query(
+            `UPDATE ongoing_games SET move_history = ? WHERE room_name = ?`,
+            [JSON.stringify(ongoingGames[room].moves), room]
+          );
+        } catch (err) {
+          console.error("[DB ERROR] Failed to update move_history:", err);
+        }
       }
-
-      // Forward move to other player
+    
       socket.to(room).emit("move", moveData);
     });
+    
   });
 };

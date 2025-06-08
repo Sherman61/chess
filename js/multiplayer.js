@@ -34,3 +34,20 @@ function formatMoveLog() {
     return output;
 } 
 
+function tryRejoinRoom() {
+    const roomFromUrl = new URLSearchParams(window.location.search).get("room");
+    if (!roomFromUrl || !socket) return;
+  
+    socket.emit("rejoinRoom", roomFromUrl);
+  
+    socket.on("roomInfo", (info) => {
+      connectedOpponent = info.opponentDisplayName || info.opponentUsername;
+      document.getElementById("status").innerText = `Connected to: ${connectedOpponent}`;
+      document.getElementById("statusText").innerText = `Connected to: ${connectedOpponent}`;
+    });
+  
+    socket.on("roomRejoinError", (errMsg) => {
+      console.warn("[ROOM ERROR]", errMsg);
+    });
+  }
+  

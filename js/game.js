@@ -1,8 +1,8 @@
+//game.js
 let socket;
 let room = getRoomFromURL(); // ✅ Extract room from URL on load
 let currentUser;
-// let myPlayerColor = null;
-// let multiplayerMode = false;
+
 let connectedOpponent = null;
 
 // Fetch session info from PHP
@@ -19,13 +19,13 @@ fetch('check_session.php')
     document.getElementById('status').innerText = `Logged in as: ${currentUser}`;
 
     // Connect to secure Socket.IO server
-    socket = io("https://shiyaswebsite.com:3001", {
+    socket = io("https://shiyaswebsite.com:3001", { 
       auth: { username: currentUser }
     });
 
     socket.on("connect", () => {
       console.log("[Socket.IO] Connected:", socket.id);
-
+      tryRejoinRoom(); // 🔁 Now safe to call
       // ✅ Auto-start game if room is defined from URL
       if (room && room.includes("-")) {
         const [player1, player2] = room.split("-");
