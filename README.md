@@ -1,14 +1,31 @@
-# Chess
+# Chess Game
 
-Live Demo: https://mshvarts.github.io/Chess/
+This repository contains a web-based chess game implemented with **JavaScript**, **HTML** and **CSS**. A small Node.js server using [Socket.IO](https://socket.io/) powers the real-time multiplayer mode. You can try the project online or run it locally for development.
 
-A two-player chess game written in JavaScript, HTML, and CSS. 
- 
-I was responsible for writing the game logic (including special moves such as Castling, Promotion, and En Passant), which makes up over a thousand lines of code in total.
+## Live Demo
 
-This was made as a two-member group project for a web development class at Langara College.    
+<https://mshvarts.github.io/Chess/>
 
-### Screenshot:  
-![Image of Chess Board](demo.png)
+## Features
 
-![Image of Chess Board](demo2.PNG)
+- Classic chess rules with special moves such as castling, promotion and en passant
+- Local two player mode as well as basic online matchmaking
+- Simple login and invite system
+- Screens for singleplayer, multiplayer and game lobby
+
+## Getting Started
+
+To play around with the project locally you will need Node.js installed. Install the dependencies and start the Socket.IO server:
+
+```bash
+npm install
+node server.js
+```
+
+The HTML files can then be served with any static file server. Opening `index.html` will launch the board and pieces. Multiplayer mode expects the Socket.IO server to run on port **3001**.
+
+## Screenshot
+
+![Board screenshot](demo.png)
+
+![Another board screenshot](demo2.PNG)
