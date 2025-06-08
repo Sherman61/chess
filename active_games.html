@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Active Games</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    #status {
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: white;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .no-games {
+      margin-top: 20px;
+      font-style: italic;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Active Games</h1>
+  <div id="status">Checking session...</div>
+  <ul id="gamesList"></ul>
+  <p class="no-games" id="noGames" style="display: none;">No active games ongoing.</p>
+
+  <script>
+    let currentUser = null;
+
+    fetch("check_session.php")
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username) {
+          alert("Not logged in");
+          window.location.href = "login.html";
+          return;
+        }
+
+        currentUser = data.username;
+        document.getElementById("status").innerText = "Logged in as: " + currentUser;
+        fetchGames();
+      });
+
+    function fetchGames() {
+      fetch("get_active_games.php")
+        .then(res => res.json())
+        .then(games => {
+          const list = document.getElementById("gamesList");
+          const noGames = document.getElementById("noGames");
+          list.innerHTML = "";
+
+          if (!Array.isArray(games) || games.length === 0) {
+            noGames.style.display = "block";
+            return;
+          }
+
+          noGames.style.display = "none";
+
+          games.forEach(game => {
+            const opponent = (game.white_player === currentUser)
+              ? game.black_player
+              : game.white_player;
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+              <strong>Room:</strong> ${game.room_name}<br>
+              <strong>Opponent:</strong> ${opponent}<br>
+              <button onclick="joinGame('${game.room_name}')">Join Game</button>
+            `;
+            list.appendChild(li);
+          });
+        })
+        .catch(err => {
+          document.getElementById("status").innerText = "Error loading games.";
+          console.error("[Active Games] Failed to load games:", err);
+        });
+    }
+
+    function joinGame(roomName) {
+      const params = new URLSearchParams();
+      params.set("room", roomName);
+      params.set("user", currentUser);
+      window.location.href = "multiplayer.html?" + params.toString();
+    }
+  </script>
+</body>
+</html>

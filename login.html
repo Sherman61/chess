@@ -71,7 +71,7 @@ const response = await fetch('login.php', {
   const result = await response.json();
 
   if (result.success) {
-    window.location.href = 'multiplayer.html';
+    window.location.href = 'index.html';
   } else {
     document.getElementById('errorMsg').innerText = result.message || 'Invalid login credentials';
   }

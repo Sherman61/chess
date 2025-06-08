@@ -1,66 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Chess - editing</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    a {
+      display: block;
+      margin: 15px 0;
+      padding: 12px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #007bff;
+      text-decoration: none;
+      border-radius: 6px;
+      width: 250px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: background-color 0.3s;
+    }
+    a:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
-<body onload="setup();">
-
-<h1></h1>
-<p id="turnInfo">Player's turn: <b>White</b></p>
-<section id="board">
-    <div class="overlay" id="promotionMessage">
-        <div class="overlay-inner">
-            <span class="overlay-title">Promotion!</span>
-            <p class="overlay-text" id="alertText"></p>
-            <ul id="promotionList" class="white">
-                <li><a href="#" class="promotion-button queen" onclick="promote('queen');"></a></li>
-                <li><a href="#" class="promotion-button castle" onclick="promote('castle');"></a></li>
-                <li><a href="#" class="promotion-button bishop" onclick="promote('bishop');"></a></li>
-                <li><a href="#" class="promotion-button knight" onclick="promote('knight');"></a></li>
-            </ul>
-        </div>
-    </div>
-	<div class="overlay" id="errorMessage">
-		<div class="overlay-inner">
-			<span class="overlay-title">Error!</span>
-			<p class="overlay-text" id="errorText"></p>
-			<a href="#" class="overlay-button" onclick="closeError();">Close</a>
-		</div>
-	</div>
-	<div class="overlay" id="endMessage">
-		<div class="overlay-inner">
-			<span class="overlay-title">Game Over!</span>
-			<p class="overlay-text" id="endText"></p>
-			<a href="#" class="overlay-button" onclick="newGame();">New Game</a>
-		</div>
-	</div>
-</section>
-<script src="http://shiyaswebsite.com:3001/socket.io/socket.io.js"></script>
-
-<script>
-  const socket = io();
-
-  let myColor;
-  socket.on('playerColor', color => {
-    console.log("connected to socket")
-    myColor = color;
-    alert("You are: " + color);
-  });
-
-  socket.on('move', data => {
-    // Update board state with opponent's move
-    applyMove(data);
-  });
-
-  function emitMove(move) {
-    socket.emit('move', move);
-  }
-</script>
-
-<script type="text/javascript" src="js/scripts.js"></script>
-
+<body>
+  <h1>Welcome to Shiya's Chess</h1>
+  <a href="single_player.html">Offline Mode</a>
+  <a href="multiplayer.html">Multiplayer Mode</a>
+  <a href="invites.html">Invites</a>
+  <a href="active_games.html">Active Games</a>
 </body>
 </html>

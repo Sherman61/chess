@@ -50,26 +50,38 @@ fetch('check_session.php')
       }
     });
 
-    // Room joined (invite accepted)
-    socket.on("inviteAccepted", data => {
-        const roomName = typeof data === "string" ? data : data.room;
-        if (!room) {
-          room = roomName;
-          window.history.replaceState({}, '', `?room=${encodeURIComponent(roomName)}`);
-        }
-      
-        const [player1, player2] = roomName.split("-");
-        const isWhite = currentUser === player1;
-        myPlayerColor = isWhite ? "white" : "black";
-        
-        connectedOpponent = data.opponentDisplayName || data.opponentUsername || (isWhite ? player2 : player1);
-      
-        document.getElementById("status").innerText = `Connected to: ${connectedOpponent}`;
-        document.getElementById("statusText").innerText = `Connected to: ${connectedOpponent}`;
-        document.getElementById("inviteSection").style.display = "none";
-      
-        startGame(myPlayerColor);
-      });
+  // Room joined (invite accepted)
+socket.on("inviteAccepted", data => {
+  const roomName = typeof data === "string" ? data : data.room;
+
+  // Update the room if not already set
+  if (!room) {
+    room = roomName;
+    window.history.replaceState({}, '', `?room=${encodeURIComponent(roomName)}`);
+  }
+
+  const [player1, player2] = roomName.split("-");
+  const isWhite = currentUser === player1;
+  myPlayerColor = isWhite ? "white" : "black";
+
+  // Determine opponent identity with proper fallbacks
+  connectedOpponent = data?.opponentDisplayName || data?.opponentUsername || (isWhite ? player2 : player1);
+
+  // UI updates
+  const statusText = connectedOpponent ? `Connected to: ${connectedOpponent}` : "Connected";
+  const statusEl = document.getElementById("status");
+  const statusTextEl = document.getElementById("statusText");
+
+  if (statusEl) statusEl.innerText = statusText;
+  if (statusTextEl) statusTextEl.innerText = statusText;
+
+  const inviteSection = document.getElementById("inviteSection");
+  if (inviteSection) inviteSection.style.display = "none";
+
+  // Start the game with color
+  startGame(myPlayerColor);
+});
+
       
       
       
@@ -112,17 +124,20 @@ function getRoomFromURL() {
 
 // Start the game with assigned color
 
-function startGame(color) {
+ 
+  function startGame(color) {
     myPlayerColor = color;
     multiplayerMode = true;
   
-    // Delay to ensure DOM is fully loaded before calling setup()
+    // Flip board if user is black
+    setup(color === "black");
+  
     setTimeout(() => {
-    //   setup();
-      console.log(`Multiplayer game started. You are ${color}.`);
       document.getElementById('turnInfo').innerHTML = `Your move (${color})`;
+      console.log(`Multiplayer game started. You are ${color}.`);
     }, 50);
   }
+  
   //game.js
 // Apply opponent's move
 // function applyMove(data) {
